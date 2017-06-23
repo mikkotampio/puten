@@ -27,19 +27,39 @@ public class Lexer {
 	
 	private Token next() {
 		if(isNextSpecialToken()) {
-			Token next = nextSpecialToken();
-			index += next.content.length();
-			return next;
+			return nextSpecialToken();
+		}
+		
+		if(isNextWhitespace()) {
+			return nextWhitespace();
 		}
 		
 		int start = index;
-		while(index < string.length() && !isNextSpecialToken()) {
+		while(index < string.length() && isNextValidStringChar()) {
 			nextChar();
 		}
 		
 		String substr = string.substring(start, index);
 		if(substr.isEmpty()) return null;
 		return string(substr);
+	}
+	
+	private boolean isNextValidStringChar() {
+		return !isNextWhitespace() && !isNextSpecialToken();
+	}
+	
+	private boolean isNextWhitespace() {
+		return isNext(' ') || isNext('\t') || isNext('\n');
+	}
+	
+	private Token nextWhitespace() {
+		int start = index;
+		while(index < string.length() && isNextWhitespace()) {
+			index++;
+		}
+		String substr = string.substring(start, index);
+		if(substr.isEmpty()) return null;
+		return whitespace(substr);
 	}
 	
 	private boolean isNextSpecialToken() {
@@ -72,11 +92,13 @@ public class Lexer {
 	}
 
 	private Token nextSpecialToken() {
-		if(isNext(':')) return COLON;
-		if(isNext('{')) return OPENING_BRACE;
-		if(isNext('}')) return CLOSING_BRACE;
-		if(isNext('\\')) return BACKSLASH;
-		throw new AssertionError("was " + string.charAt(index));
+		char chr = string.charAt(index);
+		index++;
+		if(chr == ':') return COLON;
+		if(chr == '{') return OPENING_BRACE;
+		if(chr == '}') return CLOSING_BRACE;
+		if(chr == '\\') return BACKSLASH;
+		throw new AssertionError("was " + chr);
 	}
 	
 	private void nextChar() {
@@ -88,6 +110,8 @@ public class Lexer {
 		index++;
 	}
 	
+	/** Turns its argument into a list of tokens. Should not
+	 * throw any exceptions. */
 	public static List<Token> process(String string) {
 		return new Lexer(string).toTokens();
 	}

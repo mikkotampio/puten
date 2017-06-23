@@ -18,6 +18,10 @@ public class Token {
 		return new Token(TokenType.STRING, content);
 	}
 	
+	public static Token whitespace(String content) {
+		return new Token(TokenType.WHITESPACE, content);
+	}
+	
 	public final TokenType type;
 	public final String content;
 	
@@ -93,7 +97,11 @@ public class Token {
 		BACKSLASH("\\"),
 		
 		/** Represents an arbitrary string. */
-		STRING;
+		STRING,
+		
+		/** Represents a group of whitespace characters (spaces,
+		 * tabs or newlines). */
+		WHITESPACE;
 		
 		private final String content;
 		

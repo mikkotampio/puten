@@ -34,4 +34,14 @@ public class TestLexer {
 		assertEquals(process("\\:\\\\\\{\\}a"), list(
 				string("\\:\\\\\\{\\}a")));
 	}
+	
+	@Test
+	public void testLexingWhitespace() {
+		assertEquals(process("aa \nbb\t\tc"), list(
+				string("aa"),
+				whitespace(" \n"),
+				string("bb"),
+				whitespace("\t\t"),
+				string("c")));
+	}
 }
