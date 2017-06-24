@@ -1,5 +1,8 @@
 package fi.purkka.puten.parser;
 
+import fi.purkka.puten.runtime.Context;
+import fi.purkka.puten.runtime.Value;
+
 public class VariableAccess implements Node {
 	
 	private final String var;
@@ -14,7 +17,7 @@ public class VariableAccess implements Node {
 	}
 
 	@Override
-	public String evaluate() {
-		throw new AssertionError("NYI");
+	public Value evaluate(Context context) {
+		return context.get(var);
 	}
 }

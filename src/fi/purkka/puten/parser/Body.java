@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import fi.purkka.puten.runtime.Context;
+import fi.purkka.puten.runtime.StrValue;
+import fi.purkka.puten.runtime.Value;
+
 /** Contains zero or more other nodes and evaluates itself by combining
  * the results of evaluating its children. */
 public class Body implements Node {
@@ -31,12 +35,31 @@ public class Body implements Node {
 	}
 
 	@Override
-	public String evaluate() {
-		StringBuilder sb = new StringBuilder();
-		for(Node node : nodes) {
-			sb.append(node.evaluate());
+	public Value evaluate(Context context) {
+		return new BodyValue(context);
+	}
+	
+	private class BodyValue implements Value {
+		
+		private Context defaultContext;
+		
+		BodyValue(Context defaultContext) {
+			this.defaultContext = defaultContext;
 		}
-		return sb.toString();
+		
+		@Override
+		public Value evaluate(Context context) {
+			StringBuilder sb = new StringBuilder();
+			for(Node node : nodes) {
+				sb.append(node.evaluate(context).string());
+			}
+			return new StrValue(sb.toString());
+		}
+		
+		@Override
+		public String string() {
+			return evaluate(defaultContext).string();
+		}
 	}
 	
 	@Override

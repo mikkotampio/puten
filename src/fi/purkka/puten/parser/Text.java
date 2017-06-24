@@ -1,6 +1,9 @@
 package fi.purkka.puten.parser;
 
 import fi.purkka.puten.lexer.Token;
+import fi.purkka.puten.runtime.Context;
+import fi.purkka.puten.runtime.StrValue;
+import fi.purkka.puten.runtime.Value;
 
 /** Represents a single {@link Token} interpreted as plaintext. */
 public class Text implements Node {
@@ -12,8 +15,8 @@ public class Text implements Node {
 	}
 
 	@Override
-	public String evaluate() {
-		return content;
+	public Value evaluate(Context context) {
+		return new StrValue(content);
 	}
 	
 	@Override

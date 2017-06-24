@@ -7,6 +7,7 @@ import org.junit.Test;
 import fi.purkka.puten.lexer.Lexer;
 import fi.purkka.puten.parser.ParseException;
 import fi.purkka.puten.parser.Parser;
+import fi.purkka.puten.runtime.Context;
 
 public class TestParser {
 	
@@ -19,7 +20,7 @@ public class TestParser {
 	}
 	
 	private static String eval(String code) {
-		return Parser.parse(Lexer.process(code)).evaluate();
+		return Parser.parse(Lexer.process(code)).evaluate(Context.mutable()).string();
 	}
 	
 	@Test

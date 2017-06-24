@@ -8,5 +8,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
 	TestLexer.class,
 	TestParser.class,
+	TestRuntime.class
 })
 public class PutenSuite {}

@@ -1,6 +1,10 @@
 package fi.purkka.puten.parser;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import fi.purkka.puten.runtime.Context;
+import fi.purkka.puten.runtime.Value;
 
 /** A call of some command with some arguments and a body. */
 public class CommandCall implements Node {
@@ -16,8 +20,10 @@ public class CommandCall implements Node {
 	}
 
 	@Override
-	public String evaluate() {
-		throw new AssertionError("NYI");
+	public Value evaluate(Context context) {
+		return context.get(name).call(args.stream()
+				.map(a -> a.evaluate(context))
+				.collect(Collectors.toList()), body, context);
 	}
 	
 	@Override
