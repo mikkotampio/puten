@@ -20,13 +20,17 @@ public class Puten {
 				.equalsSeparated().parse()) {
 			
 			if(jargs.get(JarpaArg.flag("--help").alias("-h"))) {
-				System.out.println("Usage: puten [--target|-t]=TARGET [--output|-o]=OUTPUT FILE");
+				System.out.println("Usage: puten --target|-t=TARGET --output|-o=OUTPUT [--std|-s=STD_LOCATION] FILE");
 				return;
 			}
 			
 			String target = jargs.get(string("--target").alias("-t"));
 			String file = jargs.get(string(""));
 			String outputFile = jargs.get(string("--output").alias("-o"));
+			String std = jargs.get(string("--std").alias("-s")
+					.optional()).orElse(System.getProperty("home.directory")+"/.puten");
+			
+			System.out.println("std " + std);
 			
 			Context context = Context.mutable();
 			context.globalSet("target", new StrValue(target));
