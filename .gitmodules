@@ -1,0 +1,3 @@
+[submodule "jarpa"]
+	path = jarpa
+	url = https://github.com/mikkotampio/jarpa.git

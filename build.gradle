@@ -1,13 +1,19 @@
-apply plugin: 'java'
+plugins {
+	id 'com.github.johnrengelman.shadow' version '1.2.3'
+	id 'java'
+	id 'application'
+}
 
 sourceCompatibility = 1.8
 version = '0.1.0'
+mainClassName = 'fi.purkka.puten.Puten'
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 dependencies {
-    testCompile 'junit:junit:4.12'
+	compile project(':jarpa')
+	testCompile 'junit:junit:4.12'
 }
 
 sourceSets.main.java.srcDirs = ['src']

@@ -38,5 +38,29 @@ public class Natives {
 			
 			return Void.INSTANCE;
 		}));
+		
+		put("exec", new Command(c -> {
+			try {
+				String cmd = c.get("content").string();
+				new ProcessBuilder(cmd.split("\\s"))
+						.inheritIO()
+						.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return new StrValue(e.getMessage());
+			}
+			return Void.INSTANCE;
+		}));
+		
+		put("if", new Command(c -> {
+			String val1 = c.get("val1").string();
+			String val2 = c.get("val2").string();
+			
+			if(val1.equals(val2)) {
+				return c.get("content").evaluate(c);
+			}
+			
+			return Void.INSTANCE;
+		}, "val1", "val2"));
 	}
 }

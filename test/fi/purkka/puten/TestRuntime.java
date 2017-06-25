@@ -48,4 +48,9 @@ public class TestRuntime {
 	public void testFixingSpaces() {
 		assertEquals(eval("a                b"), "a b");
 	}
+	
+	@Test
+	public void testIf() {
+		assertEquals(eval("\\set:a:1{} \\if:{\\a}:1{kissa} "), "kissa");
+	}
 }
