@@ -1,6 +1,8 @@
 package fi.purkka.puten.runtime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** Describes some context in which commands are evaluated. */
@@ -14,6 +16,7 @@ public class Context {
 	private final Context upper;
 	private final Map<String, Value> map = new HashMap<>();
 	private final boolean mutable;
+	private final List<Runnable> afters = new ArrayList<>();
 	
 	private Context(Context upper, boolean mutable) {
 		this.upper = upper;
@@ -64,6 +67,18 @@ public class Context {
 			}
 			map.put(var, val);
 		}
+	}
+	
+	public void addAfterHook(Runnable r) {
+		if(upper != null) {
+			upper.addAfterHook(r);
+		} else {
+			afters.add(r);
+		}
+	}
+	
+	public List<Runnable> afterHooks() {
+		return upper == null ? afters : upper.afterHooks();
 	}
 	
 	@Override

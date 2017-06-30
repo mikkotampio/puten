@@ -16,6 +16,11 @@ public class StrValue implements Value {
 	
 	@Override
 	public String toString() {
-		return "String(" + string + ")";
+		return string;
+	}
+	
+	@Override
+	public double number() {
+		return Double.parseDouble(string);
 	}
 }

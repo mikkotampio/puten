@@ -1,5 +1,6 @@
 package fi.purkka.puten.runtime;
 
+import java.util.Iterator;
 import java.util.List;
 
 import fi.purkka.puten.parser.Body;
@@ -27,5 +28,15 @@ public interface Value {
 	/** Returns a double representation of this value. */
 	public default double number() {
 		throw new EvaluationException("Not numeric: " + string());
+	}
+	
+	/** Returns an int representation of this value. */
+	public default int integer() {
+		return (int) number();
+	}
+	
+	/** Returns an iterator iterating over this value. */
+	public default Iterator<Value> iterator() {
+		throw new EvaluationException("Not iterable: " + string());
 	}
 }

@@ -37,11 +37,29 @@ public class TestLexer {
 	
 	@Test
 	public void testLexingWhitespace() {
-		assertEquals(process("aa \nbb\t\tc"), list(
-				string("aa"),
+		assertEquals(process("a\\#a \nbb\t\tc"), list(
+				string("a\\#a"),
 				whitespace(" \n"),
 				string("bb"),
 				whitespace("\t\t"),
 				string("c")));
+	}
+	
+
+	@Test
+	public void testEscapingBug() {
+		assertEquals(process("\\}}"), list(
+				string("\\}"),
+				CLOSING_BRACE));
+	}
+	
+	@Test
+	public void testLexingEscapedString() {
+		assertEquals(process("#kissa\\#{}:#  #aa#  #b#"), list(
+				string("#kissa\\#{}:#"),
+				whitespace("  "),
+				string("#aa#"),
+				whitespace("  "),
+				string("#b#")));
 	}
 }

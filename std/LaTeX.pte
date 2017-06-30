@@ -1,0 +1,6 @@
+\replace:":''{}
+
+\define:i{\\textit\{\trim{ \content }\}}
+\define:b{\\textbf\{\trim{ \content }\}}
+
+\define:break{\\pfbreak}

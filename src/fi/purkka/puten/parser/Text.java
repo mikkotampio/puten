@@ -1,5 +1,7 @@
 package fi.purkka.puten.parser;
 
+import java.util.regex.Pattern;
+
 import fi.purkka.puten.lexer.Token;
 import fi.purkka.puten.runtime.Context;
 import fi.purkka.puten.runtime.StrValue;
@@ -16,7 +18,22 @@ public class Text implements Node {
 
 	@Override
 	public Value evaluate(Context context) {
-		return new StrValue(content);
+		return new StrValue(unescape(content));
+	}
+	
+	private final static Pattern N_PATTERN = Pattern.compile("([^\\\\])\\\\n");
+	private final static Pattern T_PATTERN = Pattern.compile("([^\\\\])\\\\t");
+	
+	private static String unescape(String str) {
+		if(str.length() >= 2 && str.startsWith("#") && str.endsWith("#") && !str.endsWith("\\#")) {
+			str = N_PATTERN.matcher(str).replaceAll("$1\n");
+			str = T_PATTERN.matcher(str).replaceAll("$1\t");
+			str = str.replace("\\\\n", "\\n");
+			str = str.replace("\\\\t", "\\t");
+			str = str.substring(1, str.length()-1);
+		}
+		
+		return str;
 	}
 	
 	@Override

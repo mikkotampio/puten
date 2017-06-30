@@ -30,15 +30,21 @@ public class Puten {
 			String std = jargs.get(string("--std").alias("-s")
 					.optional()).orElse(System.getProperty("home.directory")+"/.puten");
 			
-			System.out.println("std " + std);
+			FileIO.loadLibraries(std, target).evaluate(Context.mutable()).string();
 			
 			Context context = Context.mutable();
 			context.globalSet("target", new StrValue(target));
+			context.globalSet("outfile", new StrValue(outputFile));
 			
 			Body body = Parser.parse(Lexer.process(FileIO.read(file)));
 			String output = PostProcessor.process(body.evaluate(context).string());
 			
 			FileIO.write(outputFile, output);
+			
+			for(Runnable runnable : context.afterHooks()) {
+				runnable.run();
+			}
+			
 		} catch(JarpaException e) {
 			System.out.println("Error: " + e.getMessage());
 		}

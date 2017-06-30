@@ -26,6 +26,16 @@ public class Lexer {
 	}
 	
 	private Token next() {
+		if(isNext('#') && prevChar() != '\\') {
+			int start = index;
+			do {
+				index++;
+			} while(index < string.length() && !(isNext('#') && prevChar() != '\\'));
+			index++;
+			String substr = string.substring(start, index);
+			return string(substr);
+		}
+		
 		if(isNextSpecialToken()) {
 			return nextSpecialToken();
 		}
@@ -42,6 +52,10 @@ public class Lexer {
 		String substr = string.substring(start, index);
 		if(substr.isEmpty()) return null;
 		return string(substr);
+	}
+	
+	private char prevChar() {
+		return index >= 1 ? string.charAt(index-1) : '\0';
 	}
 	
 	private boolean isNextValidStringChar() {
@@ -73,6 +87,7 @@ public class Lexer {
 		if(isNext(':')) return true;
 		if(isNext('{')) return true;
 		if(isNext('}')) return true;
+		if(isNext('#')) return true;
 		
 		return false;
 	}
@@ -83,7 +98,8 @@ public class Lexer {
 	}
 	
 	private boolean isNextEscapeSequence() {
-		return isNext("\\:") || isNext("\\{") || isNext("\\}") || isNext("\\\\");
+		return isNext("\\:") || isNext("\\{") || isNext("\\}") || isNext("\\\\")
+				|| isNext("\\#");
 	}
 	
 	private boolean isNext(String arg) {
@@ -104,7 +120,7 @@ public class Lexer {
 	private void nextChar() {
 		if(isNext('\\')) {
 			if(isNextEscapeSequence()) {
-				index+=2;
+				index+=1;
 			}
 		}
 		index++;

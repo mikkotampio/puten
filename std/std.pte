@@ -1,0 +1,13 @@
+\define:identity{\content}
+
+\define:targets:{\varargs}{
+	\set:found:false{}
+	\for:arg:{\args}{
+		\if:{\arg}:{\target}{
+			\set:found:true{}
+		}
+	}
+	\if:{\found}:false{
+		\error{Illegal target \target}
+	}
+}

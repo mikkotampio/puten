@@ -1,9 +1,12 @@
 package fi.purkka.puten.runtime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import fi.purkka.puten.FileIO;
+import fi.purkka.puten.lexer.Lexer;
+import fi.purkka.puten.parser.Parser;
+import fi.purkka.puten.parser.PostProcessor;
 
 public class Natives {
 	
@@ -19,6 +22,8 @@ public class Natives {
 			return Void.INSTANCE;
 		}, "var", "val"));
 		
+		put("varargs", Special.VARARGS);
+		
 		put("define", Command.varargs(c -> {
 			List<String> args = new ArrayList<>();
 			if(!c.hasLocalValue("1")) {
@@ -26,15 +31,21 @@ public class Natives {
 			}
 			String name = c.get("1").string();
 			
-			int i = 2;
-			while(c.hasLocalValue(""+i)) {
-				args.add(c.get(""+i).string());
-				i++;
+			if(c.hasLocalValue("2") && c.get("2").equals(Special.VARARGS)) {
+				c.define(name, Command.varargs(context -> {
+					return c.get("content").evaluate(context);
+				}));
+			} else {
+				int i = 2;
+				while(c.hasLocalValue(""+i)) {
+					args.add(c.get(""+i).string());
+					i++;
+				}
+				
+				c.define(name, new Command(context -> {
+					return c.get("content").evaluate(context);
+				}, args.toArray(new String[args.size()])));
 			}
-			
-			c.define(name, new Command(context -> {
-				return c.get("content").evaluate(context);
-			}, args.toArray(new String[args.size()])));
 			
 			return Void.INSTANCE;
 		}));
@@ -44,7 +55,7 @@ public class Natives {
 				String cmd = c.get("content").string();
 				new ProcessBuilder(cmd.split("\\s"))
 						.inheritIO()
-						.start();
+						.start().waitFor();
 			} catch (Exception e) {
 				e.printStackTrace();
 				return new StrValue(e.getMessage());
@@ -62,5 +73,72 @@ public class Natives {
 			
 			return Void.INSTANCE;
 		}, "val1", "val2"));
+		
+		put("for", new Command(c -> {
+			Iterator<Value> vals = c.get("list").evaluate(c).iterator();
+			String item = c.get("item").string();
+			StringBuilder sb = new StringBuilder();
+			
+			while(vals.hasNext()) {
+				Value val = vals.next();
+				Context context = Context.commandCallContext(c);
+				context.localSet(item, val);
+				sb.append(c.get("content").evaluate(context));
+			}
+			
+			return new StrValue(sb.toString());
+		}, "item", "list"));
+		
+		put("error", new Command(c -> {
+			throw new EvaluationException(c.get("content").string());
+		}));
+		
+		put("includeplain", new Command(c -> {
+			return new StrValue(FileIO.read(c.get("content").string()));
+		}));
+		
+		put("include", new Command(c -> {
+			String content = FileIO.read(c.get("content").string());
+			return Parser.parse(Lexer.process(content)).evaluate(c);
+		}));
+		
+		put("replace", new Command(c -> {
+			PostProcessor.registerTransformation(s -> {
+				return s.replace(c.get("1").string(), c.get("2").string());
+			});
+			return Void.INSTANCE;
+		}, "1", "2"));
+		
+		put("regexreplace", new Command(c -> {
+			PostProcessor.registerTransformation(s -> {
+				return s.replaceAll(c.get("1").string(), c.get("2").string());
+			});
+			return Void.INSTANCE;
+		}, "1", "2"));
+		
+		put("filesmatching", new Command(c -> {
+			String regex = Arrays.stream(c.get("content").string().split("\\*"))
+					.map(s -> s.isEmpty() ? "" : "\\Q"+s+"\\E")
+					.collect(Collectors.joining(".*"));
+			
+			if(regex.isEmpty()) { regex = ".*"; }
+			
+			return ListValue.of(FileIO.filesMatching(regex));
+		}));
+		
+		put("trim", new Command(c -> {
+			return new StrValue(c.get("content").evaluate(c).string().trim());
+		}));
+		
+		put("after", new Command(c -> {
+			Value content = c.get("content");
+			c.addAfterHook(() -> {
+				String result = content.evaluate(c).string().trim();
+				if(!result.isEmpty()) {
+					System.out.println(result);
+				}
+			});
+			return Void.INSTANCE;
+		}));
 	}
 }

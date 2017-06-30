@@ -26,7 +26,7 @@ public class Command implements Value {
 		if(!varargs) {
 			if(this.args.size() != args.size()) {
 				throw new EvaluationException("Incorrect number of args: "
-						+ this.args.size() + " required, " + args.size() + "given");
+						+ this.args.size() + " required, " + args.size() + " given");
 			}
 			
 			for(int i = 0; i < args.size(); i++) {
@@ -39,6 +39,7 @@ public class Command implements Value {
 		}
 		
 		context.localSet("content", body.evaluate(upContext));
+		context.localSet("args", new ListValue(args));
 		
 		return func.callImpl(context);
 	}

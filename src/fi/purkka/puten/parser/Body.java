@@ -33,6 +33,12 @@ public class Body implements Node {
 	public Node first() {
 		return nodes.get(0);
 	}
+	
+	public Body join(Body other) {
+		List<Node> nodes = new ArrayList<>(this.nodes);
+		nodes.addAll(other.nodes);
+		return new Body(nodes);
+	}
 
 	@Override
 	public Value evaluate(Context context) {
